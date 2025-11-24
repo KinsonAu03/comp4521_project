@@ -26,8 +26,9 @@ class DemoData(
             latitude = 22.3193,
             longitude = 114.1694,
             country = "HK",
-            isFavorite = true,
+            isFavorite = false,
             isCurrentLocation = true,
+            isUsing = true, // Set as the location being used
             order = 0
         )
         val hongKongId = locationDao.insertLocation(hongKong)
@@ -39,7 +40,8 @@ class DemoData(
             country = "GB",
             isFavorite = true,
             isCurrentLocation = false,
-            order = 1
+            isUsing = false,
+            order = 0
         )
         val londonId = locationDao.insertLocation(london)
 
@@ -50,7 +52,8 @@ class DemoData(
             country = "JP",
             isFavorite = true,
             isCurrentLocation = false,
-            order = 2
+            isUsing = false,
+            order = 1
         )
         val tokyoId = locationDao.insertLocation(tokyo)
 

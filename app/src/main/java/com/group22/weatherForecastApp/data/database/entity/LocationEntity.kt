@@ -13,6 +13,7 @@ data class LocationEntity(
     val country: String? = null,
     val isFavorite: Boolean = false,
     val isCurrentLocation: Boolean = false,
+    val isUsing: Boolean = false, // Only one location can be is_using = true
     val order: Int = 0, // For sorting favorites
     val createdAt: Long = System.currentTimeMillis()
 )

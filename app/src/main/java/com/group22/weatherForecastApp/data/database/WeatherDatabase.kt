@@ -17,7 +17,7 @@ import com.group22.weatherForecastApp.data.database.entity.WidgetLayoutEntity
         WeatherDataEntity::class,
         WidgetLayoutEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class WeatherDatabase : RoomDatabase() {
@@ -35,7 +35,9 @@ abstract class WeatherDatabase : RoomDatabase() {
                     context.applicationContext,
                     WeatherDatabase::class.java,
                     "weather_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // For development - remove in production and add proper migration
+                    .build()
                 INSTANCE = instance
                 instance
             }

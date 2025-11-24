@@ -20,6 +20,7 @@ import com.group22.weatherForecastApp.navigation.NavRoutes
 import com.group22.weatherForecastApp.ui.components.BottomNavigationBar
 import com.group22.weatherForecastApp.ui.screens.HomeScreen
 import com.group22.weatherForecastApp.ui.screens.LoadingScreen
+import com.group22.weatherForecastApp.ui.screens.LocationManagerScreen
 import com.group22.weatherForecastApp.ui.screens.SettingsScreen
 import com.group22.weatherForecastApp.ui.screens.WeatherDetailsScreen
 import com.group22.weatherForecastApp.ui.theme.MyApplicationTheme
@@ -150,6 +151,26 @@ fun WeatherApp(appInitializer: AppInitializer) {
                 SettingsScreen(
                     onNavigateBack = {
                         Log.d("WeatherApp", "SettingsScreen: Navigating back")
+                        navController.popBackStack()
+                    },
+                    onNavigateToLocationManager = {
+                        Log.d("WeatherApp", "SettingsScreen: Navigating to LocationManager")
+                        navController.navigate(NavRoutes.LocationManager.route)
+                    }
+                )
+            }
+
+            composable(
+                route = NavRoutes.LocationManager.route,
+                enterTransition = { defaultAnimations.enter },
+                exitTransition = { defaultAnimations.exit },
+                popEnterTransition = { defaultAnimations.popEnter },
+                popExitTransition = { defaultAnimations.popExit }
+            ) {
+                Log.d("WeatherApp", "Rendering LocationManagerScreen")
+                LocationManagerScreen(
+                    onNavigateBack = {
+                        Log.d("WeatherApp", "LocationManagerScreen: Navigating back")
                         navController.popBackStack()
                     }
                 )
