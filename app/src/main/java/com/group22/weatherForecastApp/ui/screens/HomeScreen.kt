@@ -8,11 +8,10 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.group22.weatherForecastApp.ui.components.ErrorDialog
+import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,8 +40,8 @@ fun HomeScreen(
                         currentLocation?.let { location ->
                             Text(
                                 text = location.name,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                style = AppTextStyles.cardBodySmall(),
+                                color = AppColors.textSecondary()
                             )
                         }
                     }
@@ -51,8 +50,8 @@ fun HomeScreen(
                     if (isRefreshing) {
                         CircularProgressIndicator(
                             modifier = Modifier
-                                .size(24.dp)
-                                .padding(12.dp)
+                                .size(Spacing.lg)
+                                .padding(Spacing.md)
                         )
                     } else {
                         IconButton(onClick = { viewModel.refreshWeather() }) {
@@ -76,9 +75,9 @@ fun HomeScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .screenContent()
+                    .padding(Spacing.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacingLarge)
             ) {
                 // Current Weather Card
                 WeatherCard(
@@ -145,24 +144,21 @@ fun WeatherCard(
         modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = if (hasAlerts) {
-                MaterialTheme.colorScheme.errorContainer
+                AppColors.cardBackgroundError()
             } else {
-                MaterialTheme.colorScheme.surfaceVariant
+                AppColors.cardBackground()
             }
         )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+            modifier = Modifier.cardContentLarge(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = AppTextStyles.cardTitle()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.sm))
             
             when {
                 weather != null -> {
@@ -174,39 +170,39 @@ fun WeatherCard(
                             modifier = Modifier.size(64.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
                     Text(
                         text = "${viewModel?.convertTemperature(weather.temperature)?.toInt() ?: weather.temperature.toInt()}${viewModel?.getTemperatureUnitSymbol() ?: "°C"}",
-                        style = MaterialTheme.typography.displayMedium
+                        style = AppTextStyles.temperatureDisplay()
                     )
                     Text(
                         text = weather.condition,
-                        style = MaterialTheme.typography.titleMedium
+                        style = AppTextStyles.cardSubtitle()
                     )
                 }
                 hasAlerts -> {
                     Text(
                         text = "$alertsCount Active Alert${if (alertsCount > 1) "s" else ""}",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onErrorContainer
+                        style = AppTextStyles.cardSubtitle(),
+                        color = AppColors.textOnError()
                     )
                 }
                 alertsCount == 0 && title == "Weather Alerts" -> {
                     // Show "No alerts" message for alerts card when there are no alerts
                     Text(
                         text = "No alerts currently",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = AppTextStyles.cardSubtitle(),
+                        color = AppColors.textSecondary()
                     )
                 }
                 forecastCount > 0 -> {
                     Text(
                         text = "$forecastCount Days Available",
-                        style = MaterialTheme.typography.titleMedium
+                        style = AppTextStyles.cardSubtitle()
                     )
                 }
                 else -> {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(modifier = Modifier.size(Spacing.lg))
                 }
             }
         }

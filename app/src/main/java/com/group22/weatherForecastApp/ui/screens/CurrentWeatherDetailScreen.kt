@@ -11,10 +11,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -43,8 +42,8 @@ fun CurrentWeatherDetailScreen(
                     if (isRefreshing) {
                         CircularProgressIndicator(
                             modifier = Modifier
-                                .size(24.dp)
-                                .padding(12.dp)
+                                .size(Spacing.lg)
+                                .padding(Spacing.md)
                         )
                     } else {
                         IconButton(onClick = { viewModel.refreshWeather() }) {
@@ -67,20 +66,15 @@ fun CurrentWeatherDetailScreen(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .screenContent()
+                    .padding(Spacing.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacingLarge)
             ) {
                 // Current Weather Section
                 item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
-                    ) {
+                    CardStyles.primaryCard {
                         Column(
-                            modifier = Modifier.padding(24.dp),
+                            modifier = CardStyles.contentPaddingLarge,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             currentWeather?.let { weather ->
@@ -92,17 +86,16 @@ fun CurrentWeatherDetailScreen(
                                         modifier = Modifier.size(96.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(Spacing.sm))
                                 Text(
                                     text = "${viewModel.convertTemperature(weather.temperature).toInt()}${viewModel.getTemperatureUnitSymbol()}",
-                                    style = MaterialTheme.typography.displayLarge,
-                                    fontWeight = FontWeight.Bold
+                                    style = AppTextStyles.temperatureDisplayLarge()
                                 )
                                 Text(
                                     text = weather.condition,
-                                    style = MaterialTheme.typography.titleLarge
+                                    style = AppTextStyles.cardTitle()
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(Spacing.md))
                                 
                                 // Details Grid
                                 Row(
@@ -110,20 +103,20 @@ fun CurrentWeatherDetailScreen(
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("Feels Like", style = MaterialTheme.typography.bodySmall)
-                                        Text("${viewModel.convertTemperature(weather.feelsLike).toInt()}${viewModel.getTemperatureUnitSymbol()}", style = MaterialTheme.typography.bodyLarge)
+                                        Text("Feels Like", style = AppTextStyles.label())
+                                        Text("${viewModel.convertTemperature(weather.feelsLike).toInt()}${viewModel.getTemperatureUnitSymbol()}", style = AppTextStyles.value())
                                     }
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("Humidity", style = MaterialTheme.typography.bodySmall)
-                                        Text("${weather.humidity}%", style = MaterialTheme.typography.bodyLarge)
+                                        Text("Humidity", style = AppTextStyles.label())
+                                        Text("${weather.humidity}%", style = AppTextStyles.value())
                                     }
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("UV Index", style = MaterialTheme.typography.bodySmall)
-                                        Text("${weather.uvIndex?.toInt() ?: 0}", style = MaterialTheme.typography.bodyLarge)
+                                        Text("UV Index", style = AppTextStyles.label())
+                                        Text("${weather.uvIndex?.toInt() ?: 0}", style = AppTextStyles.value())
                                     }
                                 }
                                 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(Spacing.md))
                                 
                                 // Additional Details
                                 Row(
@@ -131,16 +124,16 @@ fun CurrentWeatherDetailScreen(
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("Pressure", style = MaterialTheme.typography.bodySmall)
-                                        Text("${weather.pressure?.toInt() ?: 0} hPa", style = MaterialTheme.typography.bodyLarge)
+                                        Text("Pressure", style = AppTextStyles.label())
+                                        Text("${weather.pressure?.toInt() ?: 0} hPa", style = AppTextStyles.value())
                                     }
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("Wind Speed", style = MaterialTheme.typography.bodySmall)
-                                        Text("${weather.windSpeed.toInt()} m/s", style = MaterialTheme.typography.bodyLarge)
+                                        Text("Wind Speed", style = AppTextStyles.label())
+                                        Text("${weather.windSpeed.toInt()} m/s", style = AppTextStyles.value())
                                     }
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("Visibility", style = MaterialTheme.typography.bodySmall)
-                                        Text("${(weather.visibility ?: 0.0).toInt() / 1000} km", style = MaterialTheme.typography.bodyLarge)
+                                        Text("Visibility", style = AppTextStyles.label())
+                                        Text("${(weather.visibility ?: 0.0).toInt() / 1000} km", style = AppTextStyles.value())
                                     }
                                 }
                             } ?: run {
@@ -154,8 +147,7 @@ fun CurrentWeatherDetailScreen(
                 item {
                     Text(
                         text = "24 Hour Forecast",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        style = AppTextStyles.sectionHeader()
                     )
                 }
                 
@@ -172,21 +164,14 @@ fun HourlyForecastItem(
     weather: com.group22.weatherForecastApp.data.database.entity.WeatherDataEntity,
     viewModel: WeatherViewModel
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
+    CardStyles.standardCard {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.cardContent(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.md),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 weather.conditionIcon?.let { icon ->
@@ -199,27 +184,26 @@ fun HourlyForecastItem(
                 Column {
                     Text(
                         text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(weather.timestamp)),
-                        style = MaterialTheme.typography.titleMedium
+                        style = AppTextStyles.cardSubtitle()
                     )
                     Text(
                         text = weather.condition,
-                        style = MaterialTheme.typography.bodySmall
+                        style = AppTextStyles.cardBodySmall()
                     )
                 }
             }
             Text(
                 text = "${viewModel.convertTemperature(weather.temperature).toInt()}${viewModel.getTemperatureUnitSymbol()}",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = AppTextStyles.cardTitle()
             )
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = "Humidity: ${weather.humidity}%",
-                    style = MaterialTheme.typography.bodySmall
+                    style = AppTextStyles.cardBodySmall()
                 )
                 Text(
                     text = "Wind: ${weather.windSpeed.toInt()} m/s",
-                    style = MaterialTheme.typography.bodySmall
+                    style = AppTextStyles.cardBodySmall()
                 )
             }
         }

@@ -11,10 +11,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,8 +40,8 @@ fun DailyForecastDetailScreen(
                     if (isRefreshing) {
                         CircularProgressIndicator(
                             modifier = Modifier
-                                .size(24.dp)
-                                .padding(12.dp)
+                                .size(Spacing.lg)
+                                .padding(Spacing.md)
                         )
                     } else {
                         IconButton(onClick = { viewModel.refreshWeather() }) {
@@ -65,9 +64,9 @@ fun DailyForecastDetailScreen(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .screenContent()
+                    .padding(Spacing.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacing)
             ) {
                 items(dailyForecast.take(7)) { day ->
                     DailyForecastItem(day, viewModel)
@@ -85,17 +84,10 @@ fun DailyForecastItem(
     val dateFormat = SimpleDateFormat("EEEE, MMM dd", Locale.getDefault())
     val dayName = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(weather.timestamp))
     
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
+    CardStyles.standardCard {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.cardContent(),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -103,7 +95,7 @@ fun DailyForecastItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.md),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     weather.conditionIcon?.let { icon ->
@@ -116,25 +108,23 @@ fun DailyForecastItem(
                     Column {
                         Text(
                             text = dayName,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                            style = AppTextStyles.cardTitle()
                         )
                         Text(
                             text = dateFormat.format(Date(weather.timestamp)),
-                            style = MaterialTheme.typography.bodySmall
+                            style = AppTextStyles.cardBodySmall()
                         )
                     }
                 }
                 Text(
                     text = "${viewModel.convertTemperature(weather.temperature).toInt()}${viewModel.getTemperatureUnitSymbol()}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    style = AppTextStyles.temperatureDisplay()
                 )
             }
             
             Text(
                 text = weather.condition,
-                style = MaterialTheme.typography.bodyLarge
+                style = AppTextStyles.cardBody()
             )
             
             Divider()
@@ -144,20 +134,20 @@ fun DailyForecastItem(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Humidity", style = MaterialTheme.typography.bodySmall)
-                    Text("${weather.humidity}%", style = MaterialTheme.typography.bodyMedium)
+                    Text("Humidity", style = AppTextStyles.label())
+                    Text("${weather.humidity}%", style = AppTextStyles.value())
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("UV Index", style = MaterialTheme.typography.bodySmall)
-                    Text("${weather.uvIndex?.toInt() ?: 0}", style = MaterialTheme.typography.bodyMedium)
+                    Text("UV Index", style = AppTextStyles.label())
+                    Text("${weather.uvIndex?.toInt() ?: 0}", style = AppTextStyles.value())
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Wind Speed", style = MaterialTheme.typography.bodySmall)
-                    Text("${weather.windSpeed.toInt()} m/s", style = MaterialTheme.typography.bodyMedium)
+                    Text("Wind Speed", style = AppTextStyles.label())
+                    Text("${weather.windSpeed.toInt()} m/s", style = AppTextStyles.value())
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Pressure", style = MaterialTheme.typography.bodySmall)
-                    Text("${weather.pressure?.toInt() ?: 0} hPa", style = MaterialTheme.typography.bodyMedium)
+                    Text("Pressure", style = AppTextStyles.label())
+                    Text("${weather.pressure?.toInt() ?: 0} hPa", style = AppTextStyles.value())
                 }
             }
         }

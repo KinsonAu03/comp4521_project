@@ -10,9 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,8 +39,8 @@ fun WeatherAlertsDetailScreen(
                     if (isRefreshing) {
                         CircularProgressIndicator(
                             modifier = Modifier
-                                .size(24.dp)
-                                .padding(12.dp)
+                                .size(Spacing.lg)
+                                .padding(Spacing.md)
                         )
                     } else {
                         IconButton(onClick = { viewModel.refreshWeather() }) {
@@ -63,33 +63,25 @@ fun WeatherAlertsDetailScreen(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .screenContent()
+                    .padding(Spacing.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacing)
             ) {
                 if (alerts.isEmpty()) {
                     item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        ) {
+                        CardStyles.standardCard {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                                modifier = Modifier.cardContentLarge(),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
                                     text = "No Active Alerts",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold
+                                    style = AppTextStyles.cardTitle()
                                 )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(Spacing.sm))
                                 Text(
                                     text = "There are currently no weather alerts for your location.",
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = AppTextStyles.cardBody()
                                 )
                             }
                         }
@@ -108,53 +100,45 @@ fun WeatherAlertsDetailScreen(
 fun AlertCard(alert: com.group22.weatherForecastApp.data.AlertDetail) {
     val dateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
     
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        )
-    ) {
+    CardStyles.errorCard {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.cardContent(),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
         ) {
             Text(
                 text = alert.event,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                style = AppTextStyles.cardTitle(),
+                color = AppColors.textOnError()
             )
             
             Text(
                 text = "From: ${alert.sender_name}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                style = AppTextStyles.cardBody(),
+                color = AppColors.textOnError()
             )
             
             Text(
                 text = "Start: ${dateFormat.format(Date(alert.start * 1000))}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                style = AppTextStyles.cardBodySmall(),
+                color = AppColors.textOnError()
             )
             
             Text(
                 text = "End: ${dateFormat.format(Date(alert.end * 1000))}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                style = AppTextStyles.cardBodySmall(),
+                color = AppColors.textOnError()
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.sm))
             
             Divider()
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Spacing.sm))
             
             Text(
                 text = alert.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                style = AppTextStyles.cardBody(),
+                color = AppColors.textOnError()
             )
         }
     }
