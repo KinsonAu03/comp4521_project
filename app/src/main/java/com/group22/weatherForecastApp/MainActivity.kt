@@ -182,12 +182,14 @@ fun WeatherApp(appInitializer: AppInitializer) {
             }
 
             val defaultAnimations = NavAnimations.defaultAnimations()
+            val zoomFadeAnimations = NavAnimations.zoomFadeAnimations()
+            
             composable(
                 route = NavRoutes.CurrentWeather.route,
-                enterTransition = { defaultAnimations.enter },
-                exitTransition = { defaultAnimations.exit },
-                popEnterTransition = { defaultAnimations.popEnter },
-                popExitTransition = { defaultAnimations.popExit }
+                enterTransition = { zoomFadeAnimations.enter },
+                exitTransition = { zoomFadeAnimations.exit },
+                popEnterTransition = { zoomFadeAnimations.popEnter },
+                popExitTransition = { zoomFadeAnimations.popExit }
             ) {
                 Log.d("WeatherApp", "Rendering CurrentWeatherDetailScreen")
                 CurrentWeatherDetailScreen(
@@ -200,10 +202,10 @@ fun WeatherApp(appInitializer: AppInitializer) {
 
             composable(
                 route = NavRoutes.WeatherAlerts.route,
-                enterTransition = { defaultAnimations.enter },
-                exitTransition = { defaultAnimations.exit },
-                popEnterTransition = { defaultAnimations.popEnter },
-                popExitTransition = { defaultAnimations.popExit }
+                enterTransition = { zoomFadeAnimations.enter },
+                exitTransition = { zoomFadeAnimations.exit },
+                popEnterTransition = { zoomFadeAnimations.popEnter },
+                popExitTransition = { zoomFadeAnimations.popExit }
             ) {
                 Log.d("WeatherApp", "Rendering WeatherAlertsDetailScreen")
                 WeatherAlertsDetailScreen(
@@ -216,10 +218,10 @@ fun WeatherApp(appInitializer: AppInitializer) {
 
             composable(
                 route = NavRoutes.DailyForecast.route,
-                enterTransition = { defaultAnimations.enter },
-                exitTransition = { defaultAnimations.exit },
-                popEnterTransition = { defaultAnimations.popEnter },
-                popExitTransition = { defaultAnimations.popExit }
+                enterTransition = { zoomFadeAnimations.enter },
+                exitTransition = { zoomFadeAnimations.exit },
+                popEnterTransition = { zoomFadeAnimations.popEnter },
+                popExitTransition = { zoomFadeAnimations.popExit }
             ) {
                 Log.d("WeatherApp", "Rendering DailyForecastDetailScreen")
                 DailyForecastDetailScreen(

@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 
 /**
  * Navigation animation configurations for consistent screen transitions
- * Using simple fade in/out animations
  */
 object NavAnimations {
     /**
@@ -28,6 +27,24 @@ object NavAnimations {
             exit = fadeOut(animationSpec = tween(300)),
             popEnter = fadeIn(animationSpec = tween(300)),
             popExit = fadeOut(animationSpec = tween(300))
+        )
+    }
+    
+    /**
+     * Zoom and fade animation for detail screens
+     * Creates a zoom-in effect with fade when entering
+     * Zoom-out with fade when exiting
+     */
+    fun zoomFadeAnimations(): AnimationSet {
+        return AnimationSet(
+            enter = fadeIn(animationSpec = tween(400)) + 
+                    scaleIn(initialScale = 0.8f, animationSpec = tween(400)),
+            exit = fadeOut(animationSpec = tween(300)) + 
+                   scaleOut(targetScale = 0.9f, animationSpec = tween(300)),
+            popEnter = fadeIn(animationSpec = tween(300)) + 
+                       scaleIn(initialScale = 0.9f, animationSpec = tween(300)),
+            popExit = fadeOut(animationSpec = tween(400)) + 
+                      scaleOut(targetScale = 0.8f, animationSpec = tween(400))
         )
     }
 }

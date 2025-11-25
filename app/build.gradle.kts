@@ -115,6 +115,9 @@ dependencies {
     // Logging
     implementation(libs.timber)
     
+    // Image Loading - Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

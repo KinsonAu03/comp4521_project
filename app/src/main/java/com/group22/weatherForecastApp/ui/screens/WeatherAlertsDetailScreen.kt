@@ -5,7 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +24,7 @@ fun WeatherAlertsDetailScreen(
     viewModel: WeatherViewModel = viewModel()
 ) {
     val alerts by viewModel.alerts.collectAsState(initial = emptyList())
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     
     Scaffold(
         topBar = {
@@ -31,44 +34,70 @@ fun WeatherAlertsDetailScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                }
-            )
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (alerts.isEmpty()) {
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
+                },
+                actions = {
+                    if (isRefreshing) {
+                        CircularProgressIndicator(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "No Active Alerts",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "There are currently no weather alerts for your location.",
-                                style = MaterialTheme.typography.bodyMedium
+                                .size(24.dp)
+                                .padding(12.dp)
+                        )
+                    } else {
+                        IconButton(onClick = { viewModel.refreshWeather() }) {
+                            Icon(
+                                Icons.Default.Refresh,
+                                contentDescription = "Refresh"
                             )
                         }
                     }
                 }
-            } else {
-                items(alerts) { alert ->
-                    AlertCard(alert)
+            )
+        }
+    ) { paddingValues ->
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.refreshWeather() },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if (alerts.isEmpty()) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "No Active Alerts",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "There are currently no weather alerts for your location.",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    items(alerts) { alert ->
+                        AlertCard(alert)
+                    }
                 }
             }
         }
