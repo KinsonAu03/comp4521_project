@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.group22.weatherForecastApp.data.GeocodingClient
 import com.group22.weatherForecastApp.data.GeocodingResponse
 import com.group22.weatherForecastApp.data.LocationService
-import com.group22.weatherForecastApp.data.WeatherDatabase
+import com.group22.weatherForecastApp.data.database.WeatherDatabase
 import com.group22.weatherForecastApp.data.database.entity.LocationEntity
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

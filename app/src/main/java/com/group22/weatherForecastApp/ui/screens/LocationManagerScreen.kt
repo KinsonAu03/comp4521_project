@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.group22.weatherForecastApp.data.GeocodingResponse
 import com.group22.weatherForecastApp.data.database.entity.LocationEntity
+import com.group22.weatherForecastApp.ui.utils.LOCATION_PERMISSIONS
+import com.group22.weatherForecastApp.ui.utils.rememberLocationPermissionLauncher
 import com.group22.weatherForecastApp.ui.viewmodel.LocationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,6 +35,20 @@ fun LocationManagerScreen(
 
     var searchQuery by remember { mutableStateOf("") }
     var showSearchResults by remember { mutableStateOf(false) }
+    
+    // Permission launcher for location permissions
+    val locationPermissionLauncher = rememberLocationPermissionLauncher { granted ->
+        if (granted) {
+            // Permission granted, automatically retry getting location
+            viewModel.getCurrentDeviceLocation()
+        } else {
+            // Permission denied, clear error and show message
+            viewModel.clearError()
+        }
+    }
+    
+    // Check if error is related to permission
+    val isPermissionError = errorMessage?.contains("permission", ignoreCase = true) == true
 
     // Show error snackbar
     LaunchedEffect(errorMessage) {
@@ -131,7 +147,10 @@ fun LocationManagerScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading
             ) {
-                Icon(Icons.Default.MyLocation, contentDescription = null)
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Get Current Location")
             }
@@ -146,17 +165,38 @@ fun LocationManagerScreen(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.padding(16.dp)
                     ) {
-                        Text(
-                            text = errorMessage!!,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(onClick = { viewModel.clearError() }) {
-                            Icon(Icons.Default.Close, contentDescription = "Dismiss")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = errorMessage!!,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(onClick = { viewModel.clearError() }) {
+                                Icon(Icons.Default.Close, contentDescription = "Dismiss")
+                            }
+                        }
+                        
+                        // Show "Grant Permission" button if error is permission-related
+                        if (isPermissionError) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    locationPermissionLauncher.launch(LOCATION_PERMISSIONS)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Grant Location Permission")
+                            }
                         }
                     }
                 }
