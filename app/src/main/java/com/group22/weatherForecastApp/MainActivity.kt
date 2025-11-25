@@ -23,11 +23,7 @@ import com.group22.weatherForecastApp.data.LocationService
 import com.group22.weatherForecastApp.navigation.NavAnimations
 import com.group22.weatherForecastApp.navigation.NavRoutes
 import com.group22.weatherForecastApp.ui.components.BottomNavigationBar
-import com.group22.weatherForecastApp.ui.screens.HomeScreen
-import com.group22.weatherForecastApp.ui.screens.LoadingScreen
-import com.group22.weatherForecastApp.ui.screens.LocationManagerScreen
-import com.group22.weatherForecastApp.ui.screens.SettingsScreen
-import com.group22.weatherForecastApp.ui.screens.WeatherDetailsScreen
+import com.group22.weatherForecastApp.ui.screens.*
 import com.group22.weatherForecastApp.ui.theme.MyApplicationTheme
 import com.group22.weatherForecastApp.ui.utils.LOCATION_PERMISSIONS
 import com.group22.weatherForecastApp.ui.utils.rememberLocationPermissionLauncher
@@ -170,25 +166,65 @@ fun WeatherApp(appInitializer: AppInitializer) {
             ) {
                 Log.d("WeatherApp", "Rendering HomeScreen")
                 HomeScreen(
-                    onNavigateToWeatherDetails = {
-                        Log.d("WeatherApp", "HomeScreen: Navigating to WeatherDetails")
-                        navController.navigate(NavRoutes.WeatherDetails.route)
+                    onNavigateToCurrentWeather = {
+                        Log.d("WeatherApp", "HomeScreen: Navigating to CurrentWeather")
+                        navController.navigate(NavRoutes.CurrentWeather.route)
+                    },
+                    onNavigateToAlerts = {
+                        Log.d("WeatherApp", "HomeScreen: Navigating to WeatherAlerts")
+                        navController.navigate(NavRoutes.WeatherAlerts.route)
+                    },
+                    onNavigateToDailyForecast = {
+                        Log.d("WeatherApp", "HomeScreen: Navigating to DailyForecast")
+                        navController.navigate(NavRoutes.DailyForecast.route)
                     }
                 )
             }
 
             val defaultAnimations = NavAnimations.defaultAnimations()
             composable(
-                route = NavRoutes.WeatherDetails.route,
+                route = NavRoutes.CurrentWeather.route,
                 enterTransition = { defaultAnimations.enter },
                 exitTransition = { defaultAnimations.exit },
                 popEnterTransition = { defaultAnimations.popEnter },
                 popExitTransition = { defaultAnimations.popExit }
             ) {
-                Log.d("WeatherApp", "Rendering WeatherDetailsScreen")
-                WeatherDetailsScreen(
+                Log.d("WeatherApp", "Rendering CurrentWeatherDetailScreen")
+                CurrentWeatherDetailScreen(
                     onNavigateBack = {
-                        Log.d("WeatherApp", "WeatherDetailsScreen: Navigating back")
+                        Log.d("WeatherApp", "CurrentWeatherDetailScreen: Navigating back")
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(
+                route = NavRoutes.WeatherAlerts.route,
+                enterTransition = { defaultAnimations.enter },
+                exitTransition = { defaultAnimations.exit },
+                popEnterTransition = { defaultAnimations.popEnter },
+                popExitTransition = { defaultAnimations.popExit }
+            ) {
+                Log.d("WeatherApp", "Rendering WeatherAlertsDetailScreen")
+                WeatherAlertsDetailScreen(
+                    onNavigateBack = {
+                        Log.d("WeatherApp", "WeatherAlertsDetailScreen: Navigating back")
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(
+                route = NavRoutes.DailyForecast.route,
+                enterTransition = { defaultAnimations.enter },
+                exitTransition = { defaultAnimations.exit },
+                popEnterTransition = { defaultAnimations.popEnter },
+                popExitTransition = { defaultAnimations.popExit }
+            ) {
+                Log.d("WeatherApp", "Rendering DailyForecastDetailScreen")
+                DailyForecastDetailScreen(
+                    onNavigateBack = {
+                        Log.d("WeatherApp", "DailyForecastDetailScreen: Navigating back")
                         navController.popBackStack()
                     }
                 )

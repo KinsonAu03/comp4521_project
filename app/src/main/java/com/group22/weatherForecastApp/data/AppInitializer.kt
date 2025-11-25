@@ -58,8 +58,7 @@ class AppInitializer(private val context: Context) {
         // Initialize demo data
         val demoData = DemoData(
             database.locationDao(),
-            database.weatherDataDao(),
-            database.widgetLayoutDao()
+            database.weatherDataDao()
         )
 
         // Populate demo data

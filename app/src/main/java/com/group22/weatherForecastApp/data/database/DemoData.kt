@@ -2,16 +2,13 @@ package com.group22.weatherForecastApp.data.database
 
 import com.group22.weatherForecastApp.data.database.dao.LocationDao
 import com.group22.weatherForecastApp.data.database.dao.WeatherDataDao
-import com.group22.weatherForecastApp.data.database.dao.WidgetLayoutDao
 import com.group22.weatherForecastApp.data.database.entity.LocationEntity
 import com.group22.weatherForecastApp.data.database.entity.WeatherDataEntity
-import com.group22.weatherForecastApp.data.database.entity.WidgetLayoutEntity
 import kotlinx.coroutines.flow.first
 
 class DemoData(
     private val locationDao: LocationDao,
-    private val weatherDataDao: WeatherDataDao,
-    private val widgetLayoutDao: WidgetLayoutDao
+    private val weatherDataDao: WeatherDataDao
 ) {
     suspend fun initializeDemoData() {
         // Check if data already exists
@@ -121,29 +118,6 @@ class DemoData(
             )
         }
         weatherDataDao.insertWeatherDataList(dailyForecast)
-
-        // Insert default widget layout
-        val defaultWidgets = listOf(
-            WidgetLayoutEntity(
-                widgetType = "current_weather",
-                position = 0,
-                size = "large",
-                isVisible = true
-            ),
-            WidgetLayoutEntity(
-                widgetType = "weather_alerts",
-                position = 1,
-                size = "medium",
-                isVisible = true
-            ),
-            WidgetLayoutEntity(
-                widgetType = "daily_forecast",
-                position = 2,
-                size = "large",
-                isVisible = true
-            )
-        )
-        widgetLayoutDao.insertWidgets(defaultWidgets)
     }
 }
 

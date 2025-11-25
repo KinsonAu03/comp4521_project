@@ -27,11 +27,7 @@ fun BottomNavigationBar(currentRoute: String?, onNavigate: (String) -> Unit) {
                             label = "Home",
                             icon = Icons.Default.Home
                     ),
-                    BottomNavItem(
-                            route = NavRoutes.WeatherDetails.route,
-                            label = "Details",
-                            icon = Icons.Default.Info
-                    ),
+                    // Details button disabled - removed from navigation
                     BottomNavItem(
                             route = NavRoutes.Settings.route,
                             label = "Settings",
