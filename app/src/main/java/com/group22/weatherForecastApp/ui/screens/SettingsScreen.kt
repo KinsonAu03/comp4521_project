@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.group22.weatherForecastApp.data.TemperatureUnit
+import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,40 +46,34 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .screenContent()
+                    .padding(Spacing.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacingLarge)
         ) {
             // Temperature Unit Selection
-            Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-            ) {
+            CardStyles.standardCard {
                 Column(
-                        modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                        modifier = Modifier.cardContent()
                 ) {
                     Text(
                             text = "Temperature Unit",
-                            style = MaterialTheme.typography.titleMedium
+                            style = AppTextStyles.cardTitle()
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
                     Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                     ) {
                         FilterChip(
                                 selected = temperatureUnit == TemperatureUnit.CELSIUS,
                                 onClick = { viewModel.setTemperatureUnit(TemperatureUnit.CELSIUS) },
-                                label = { Text("Celsius (°C)") },
+                                label = { Text("Celsius (°C)", style = AppTextStyles.cardBody()) },
                                 modifier = Modifier.weight(1f)
                         )
                         FilterChip(
                                 selected = temperatureUnit == TemperatureUnit.FAHRENHEIT,
                                 onClick = { viewModel.setTemperatureUnit(TemperatureUnit.FAHRENHEIT) },
-                                label = { Text("Fahrenheit (°F)") },
+                                label = { Text("Fahrenheit (°F)", style = AppTextStyles.cardBody()) },
                                 modifier = Modifier.weight(1f)
                         )
                     }
@@ -91,25 +86,23 @@ fun SettingsScreen(
                             .fillMaxWidth()
                             .clickable(onClick = onNavigateToLocationManager),
                     colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            containerColor = AppColors.cardBackground()
                     )
             ) {
                 Row(
-                        modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                        modifier = Modifier.cardContent(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
                         Text(
                                 text = "Location Manager",
-                                style = MaterialTheme.typography.titleMedium
+                                style = AppTextStyles.cardTitle()
                         )
                         Text(
                                 text = "Manage your locations and favorites",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                style = AppTextStyles.cardBodySmall(),
+                                color = AppColors.textSecondary()
                         )
                     }
                     Icon(

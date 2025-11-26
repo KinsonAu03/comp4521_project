@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.group22.weatherForecastApp.ui.theme.*
 
 @Composable
 fun LoadingScreen(
@@ -21,16 +22,16 @@ fun LoadingScreen(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacingLarge)
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(Spacing.xxl),
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = message,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = AppTextStyles.cardBody(),
+                color = AppColors.textPrimary(),
                 textAlign = TextAlign.Center
             )
         }
