@@ -14,7 +14,7 @@ import com.group22.weatherForecastApp.data.database.entity.WeatherDataEntity
         LocationEntity::class,
         WeatherDataEntity::class
     ],
-    version = 3,
+    version = 4, // Incremented for unique index on (locationId, timestamp, forecastType)
     exportSchema = false
 )
 abstract class WeatherDatabase : RoomDatabase() {

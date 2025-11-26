@@ -39,6 +39,9 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     // Loading state
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    
+    // Guard to prevent concurrent refresh calls
+    private var isRefreshingInProgress = false
 
     // Temperature unit
     val temperatureUnit: StateFlow<TemperatureUnit> = flow {
@@ -148,26 +151,27 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
 
     // Refresh weather data
     fun refreshWeather() {
+        // Prevent concurrent refresh calls
+        if (isRefreshingInProgress) {
+            return
+        }
+        
         viewModelScope.launch {
+            isRefreshingInProgress = true
             _isRefreshing.value = true
             _errorState.value = null
             try {
                 val location = currentLocation.first()
                 if (location != null) {
                     try {
-                        weatherRepository.refreshWeather(
+                        // Refresh weather data and get alerts from the same API call
+                        val alerts = weatherRepository.refreshWeather(
                             location.id,
                             location.latitude,
                             location.longitude
                         )
-                        // Fetch alerts from API
-                        try {
-                            val response =
-                                weatherApi.getOneCallWeather(location.latitude, location.longitude)
-                            _alerts.value = response.alerts ?: emptyList()
-                        } catch (e: Exception) {
-                            handleError(e, "Failed to fetch weather alerts")
-                        }
+                        // Set alerts from the response (no duplicate API call needed)
+                        _alerts.value = alerts
                     } catch (e: Exception) {
                         handleError(e, "Failed to refresh weather data")
                     }
@@ -182,6 +186,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                 handleError(e, "Failed to refresh weather data")
             } finally {
                 _isRefreshing.value = false
+                isRefreshingInProgress = false
             }
         }
     }
@@ -243,9 +248,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         _errorState.value = error
     }
 
-    init {
-        // Refresh on init
-        refreshWeather()
-    }
+    // No automatic refresh in init - data is loaded by AppInitializer on app startup
+    // Users can manually refresh via refresh button or pull-to-refresh
 }
 

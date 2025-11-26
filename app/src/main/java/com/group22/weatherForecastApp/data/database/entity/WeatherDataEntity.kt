@@ -15,7 +15,10 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["locationId"])]
+    indices = [
+        Index(value = ["locationId"]),
+        Index(value = ["locationId", "timestamp", "forecastType"], unique = true)
+    ]
 )
 data class WeatherDataEntity(
     @PrimaryKey(autoGenerate = true)

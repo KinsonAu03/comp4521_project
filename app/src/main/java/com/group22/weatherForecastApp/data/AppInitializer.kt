@@ -151,29 +151,36 @@ class AppInitializer(private val context: Context) {
     }
 
     /**
-     * Initialize weather data - fetch from API, etc.
-     * This is where you would call your weather API
+     * Initialize weather data - fetch from API
+     * This is the only place where weather data is automatically fetched on app startup
+     * Screens will read from the database, and users can manually refresh via refresh button/pull-to-refresh
      */
     private suspend fun initializeWeatherData() {
         Log.d(tag, "Initializing weather data...")
-        // TODO: Add your weather API fetching logic here
-        // Example:
-        // val weatherRepository = WeatherRepository()
-        // weatherRepository.fetchCurrentWeather()
         val locationDao = database.locationDao()
         val weatherDao = database.weatherDataDao()
 
         val repository = WeatherRepository(RetrofitClient.api, weatherDao)
 
-        // Fetch all saved locations
+        // Fetch weather data for all saved locations
         val locations = locationDao.getAllLocations().first()
-
-        locations.forEach { location ->
-            repository.refreshWeather(
-                locationId = location.id,
-                lat = location.latitude,
-                lon = location.longitude
-            )
+        
+        if (locations.isNotEmpty()) {
+            locations.forEach { location ->
+                try {
+                    repository.refreshWeather(
+                        locationId = location.id,
+                        lat = location.latitude,
+                        lon = location.longitude
+                    )
+                    Log.d(tag, "Weather data loaded for location: ${location.name}")
+                } catch (e: Exception) {
+                    Log.e(tag, "Failed to load weather data for location: ${location.name}", e)
+                    // Continue with other locations even if one fails
+                }
+            }
+        } else {
+            Log.d(tag, "No locations found, skipping weather data initialization")
         }
 
         Log.d(tag, "Weather data initialization complete")

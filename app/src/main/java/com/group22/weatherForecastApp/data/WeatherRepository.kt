@@ -10,7 +10,7 @@ class WeatherRepository(
 ) {
     private val tag = "WeatherRepository"
 
-    suspend fun refreshWeather(locationId: Long, lat: Double, lon: Double) {
+    suspend fun refreshWeather(locationId: Long, lat: Double, lon: Double): List<AlertDetail> {
         val response = api.getOneCallWeather(lat, lon)
         
         // Log the complete API response
@@ -64,7 +64,8 @@ class WeatherRepository(
         
         Log.d(tag, "=============================================")
 
-        // Clear previous data for this location
+        // Clear previous data for this location BEFORE inserting new data
+        // This prevents duplicates if multiple refresh calls happen
         dao.deleteWeatherDataForLocation(locationId)
 
         // Insert current weather
@@ -127,5 +128,8 @@ class WeatherRepository(
                 )
             }
         )
+        
+        // Return alerts from the response
+        return response.alerts ?: emptyList()
     }
 }
