@@ -145,7 +145,7 @@ fun DailyForecastItem(
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Wind Speed", style = AppTextStyles.label())
-                    Text("${weather.windSpeed.toInt()} m/s", style = AppTextStyles.value())
+                    Text("${viewModel.convertWindSpeed(weather.windSpeed).toInt()}${viewModel.getWindSpeedUnitSymbol()}", style = AppTextStyles.value())
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Pressure", style = AppTextStyles.label())

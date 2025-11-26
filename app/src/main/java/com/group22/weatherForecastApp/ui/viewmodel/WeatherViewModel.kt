@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.group22.weatherForecastApp.data.PreferencesManager
 import com.group22.weatherForecastApp.data.RetrofitClient
 import com.group22.weatherForecastApp.data.TemperatureUnit
+import com.group22.weatherForecastApp.data.ThemeMode
+import com.group22.weatherForecastApp.data.WindSpeedUnit
 import com.group22.weatherForecastApp.data.WeatherRepository
 import com.group22.weatherForecastApp.data.database.WeatherDatabase
 import com.group22.weatherForecastApp.data.database.entity.WeatherDataEntity
@@ -17,6 +19,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import androidx.compose.runtime.mutableStateOf
 
 class WeatherViewModel(application: Application) : AndroidViewModel(application) {
     private val weatherDao = WeatherDatabase.getDatabase(application).weatherDataDao()
@@ -24,26 +27,52 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     private val weatherApi = RetrofitClient.api
     private val weatherRepository = WeatherRepository(weatherApi, weatherDao)
     private val preferencesManager = PreferencesManager(application)
-    
+
     // Get current location
-    val currentLocation: Flow<com.group22.weatherForecastApp.data.database.entity.LocationEntity?> = locationDao.getUsingLocation()
-    
+    val currentLocation: Flow<com.group22.weatherForecastApp.data.database.entity.LocationEntity?> =
+        locationDao.getUsingLocation()
+
     // Error state
     private val _errorState = MutableStateFlow<AppError?>(null)
     val errorState: StateFlow<AppError?> = _errorState.asStateFlow()
-    
+
     // Loading state
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-    
+
     // Temperature unit
     val temperatureUnit: StateFlow<TemperatureUnit> = flow {
         while (true) {
             emit(preferencesManager.getTemperatureUnit())
             kotlinx.coroutines.delay(100) // Check periodically
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), preferencesManager.getTemperatureUnit())
-    
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        preferencesManager.getTemperatureUnit()
+    )
+
+    val themeMode : StateFlow<ThemeMode> = flow {
+        while (true) {
+            emit(preferencesManager.getThemeMode())
+            kotlinx.coroutines.delay(100) // Check periodically
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        preferencesManager.getThemeMode()
+    )
+    val windUnit : StateFlow<WindSpeedUnit> = flow {
+        while (true) {
+            emit(preferencesManager.getWindSpeedUnit())
+            kotlinx.coroutines.delay(100) // Check periodically
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        preferencesManager.getWindSpeedUnit()
+    )
+
     // Current weather
     val currentWeather: Flow<WeatherDataEntity?> = currentLocation
         .flatMapLatest { location ->
@@ -53,7 +82,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                 flowOf(null)
             }
         }
-    
+
     // Hourly forecast (24 hours)
     val hourlyForecast: Flow<List<WeatherDataEntity>> = currentLocation
         .flatMapLatest { location ->
@@ -63,7 +92,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                 flowOf(emptyList())
             }
         }
-    
+
     // Daily forecast (7 days)
     val dailyForecast: Flow<List<WeatherDataEntity>> = currentLocation
         .flatMapLatest { location ->
@@ -73,27 +102,50 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                 flowOf(emptyList())
             }
         }
-    
+
     // Weather alerts - need to fetch from API since not stored in DB
-    private val _alerts = MutableStateFlow<List<com.group22.weatherForecastApp.data.AlertDetail>>(emptyList())
-    val alerts: StateFlow<List<com.group22.weatherForecastApp.data.AlertDetail>> = _alerts.asStateFlow()
-    
+    private val _alerts =
+        MutableStateFlow<List<com.group22.weatherForecastApp.data.AlertDetail>>(emptyList())
+    val alerts: StateFlow<List<com.group22.weatherForecastApp.data.AlertDetail>> =
+        _alerts.asStateFlow()
+
     fun setTemperatureUnit(unit: TemperatureUnit) {
         preferencesManager.setTemperatureUnit(unit)
     }
-    
+
     fun convertTemperature(celsius: Double): Double {
-        return preferencesManager.convertTemperature(celsius, preferencesManager.getTemperatureUnit())
+        return preferencesManager.convertTemperature(
+            celsius,
+            preferencesManager.getTemperatureUnit()
+        )
     }
-    
+
     fun getTemperatureUnitSymbol(): String {
         return preferencesManager.getTemperatureUnitSymbol(preferencesManager.getTemperatureUnit())
     }
-    
+
+    fun setThemeMode(mode: ThemeMode) {
+        preferencesManager.setThemeMode(mode)
+    }
+
+    fun setWindSpeedUnit(unit: WindSpeedUnit) {
+        preferencesManager.setWindSpeedUnit(unit)
+    }
+
+    fun convertWindSpeed(MS:Double):Double{
+        return preferencesManager.convertWindSpeed(
+            MS,preferencesManager.getWindSpeedUnit()
+        )
+    }
+
+    fun getWindSpeedUnitSymbol(): String {
+        return preferencesManager.getWindSpeedUnitSymbol(preferencesManager.getWindSpeedUnit())
+    }
+
     fun clearError() {
         _errorState.value = null
     }
-    
+
     // Refresh weather data
     fun refreshWeather() {
         viewModelScope.launch {
@@ -103,10 +155,15 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                 val location = currentLocation.first()
                 if (location != null) {
                     try {
-                        weatherRepository.refreshWeather(location.id, location.latitude, location.longitude)
+                        weatherRepository.refreshWeather(
+                            location.id,
+                            location.latitude,
+                            location.longitude
+                        )
                         // Fetch alerts from API
                         try {
-                            val response = weatherApi.getOneCallWeather(location.latitude, location.longitude)
+                            val response =
+                                weatherApi.getOneCallWeather(location.latitude, location.longitude)
                             _alerts.value = response.alerts ?: emptyList()
                         } catch (e: Exception) {
                             handleError(e, "Failed to fetch weather alerts")
@@ -128,7 +185,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
             }
         }
     }
-    
+
     private fun handleError(e: Exception, defaultMessage: String) {
         val error = when (e) {
             is UnknownHostException, is IOException -> {
@@ -138,6 +195,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     "Please check your internet connection and try again"
                 )
             }
+
             is SocketTimeoutException -> {
                 AppError(
                     ErrorType.NETWORK_ERROR,
@@ -145,6 +203,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     "The request took too long. Please try again"
                 )
             }
+
             is retrofit2.HttpException -> {
                 when (e.code()) {
                     401 -> AppError(
@@ -152,16 +211,19 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         "Invalid API key",
                         "Please check your API configuration"
                     )
+
                     429 -> AppError(
                         ErrorType.API_ERROR,
                         "API rate limit exceeded",
                         "Too many requests. Please try again later"
                     )
+
                     500, 502, 503 -> AppError(
                         ErrorType.API_ERROR,
                         "Weather service unavailable",
                         "The weather service is temporarily down. Please try again later"
                     )
+
                     else -> AppError(
                         ErrorType.API_ERROR,
                         "API error (${e.code()})",
@@ -169,6 +231,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     )
                 }
             }
+
             else -> {
                 AppError(
                     ErrorType.UNKNOWN_ERROR,
@@ -179,7 +242,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         }
         _errorState.value = error
     }
-    
+
     init {
         // Refresh on init
         refreshWeather()

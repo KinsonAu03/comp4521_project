@@ -27,8 +27,13 @@ import com.group22.weatherForecastApp.ui.screens.*
 import com.group22.weatherForecastApp.ui.theme.MyApplicationTheme
 import com.group22.weatherForecastApp.ui.utils.LOCATION_PERMISSIONS
 import com.group22.weatherForecastApp.ui.utils.rememberLocationPermissionLauncher
+import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
+import androidx.activity.viewModels
+import com.group22.weatherForecastApp.data.ThemeMode
+import androidx.compose.foundation.isSystemInDarkTheme
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: WeatherViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -37,7 +42,14 @@ class MainActivity : ComponentActivity() {
         val appInitializer = AppInitializer(applicationContext)
 
         setContent {
-            MyApplicationTheme {
+            val themeMode by viewModel.themeMode.collectAsState()
+            val isDarkTheme = when (themeMode) {
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
+
+            MyApplicationTheme(darkTheme = isDarkTheme) {
                 WeatherApp(appInitializer = appInitializer)
             }
         }

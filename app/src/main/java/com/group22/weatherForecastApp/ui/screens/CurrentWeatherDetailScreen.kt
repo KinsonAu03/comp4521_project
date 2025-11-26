@@ -131,7 +131,7 @@ fun CurrentWeatherDetailScreen(
                                     }
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text("Wind Speed", style = AppTextStyles.label())
-                                        Text("${weather.windSpeed.toInt()} m/s", style = AppTextStyles.value())
+                                        Text("${viewModel.convertWindSpeed(weather.windSpeed).toInt()}${viewModel.getWindSpeedUnitSymbol()}", style = AppTextStyles.value())
                                     }
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text("Visibility", style = AppTextStyles.label())
@@ -204,7 +204,7 @@ fun HourlyForecastItem(
                     style = AppTextStyles.cardBodySmall()
                 )
                 Text(
-                    text = "Wind: ${weather.windSpeed.toInt()} m/s",
+                    text = "Wind: ${viewModel.convertWindSpeed(weather.windSpeed).toInt()}${viewModel.getWindSpeedUnitSymbol()}",
                     style = AppTextStyles.cardBodySmall()
                 )
             }

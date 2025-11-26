@@ -8,11 +8,21 @@ enum class TemperatureUnit {
     FAHRENHEIT
 }
 
+enum class WindSpeedUnit {
+    KMH, MS, MPH
+}
+
+enum class ThemeMode {
+    SYSTEM, LIGHT, DARK
+}
+
 class PreferencesManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     
     companion object {
         private const val KEY_TEMPERATURE_UNIT = "temperature_unit"
+        private const val KEY_WIND_UNIT = "wind_speed_unit"
+        private const val KEY_THEME_MODE = "theme_mode"
     }
     
     fun getTemperatureUnit(): TemperatureUnit {
@@ -40,6 +50,40 @@ class PreferencesManager(context: Context) {
             TemperatureUnit.CELSIUS -> "°C"
             TemperatureUnit.FAHRENHEIT -> "°F"
         }
+    }
+
+    fun getWindSpeedUnit(): WindSpeedUnit {
+        val value = prefs.getString(KEY_WIND_UNIT, WindSpeedUnit.KMH.name)
+        return WindSpeedUnit.valueOf(value!!)
+    }
+
+    fun setWindSpeedUnit(unit: WindSpeedUnit) {
+        prefs.edit().putString(KEY_WIND_UNIT, unit.name).apply()
+    }
+
+    fun convertWindSpeed(speedInMs: Double, unit: WindSpeedUnit): Double {
+        return when (unit) {
+            WindSpeedUnit.MS -> speedInMs
+            WindSpeedUnit.KMH -> speedInMs * 3.6
+            WindSpeedUnit.MPH -> speedInMs * 2.23694
+        }
+    }
+
+    fun getWindSpeedUnitSymbol(unit: WindSpeedUnit): String {
+        return when (unit) {
+            WindSpeedUnit.MS -> "m/s"
+            WindSpeedUnit.KMH -> "km/h"
+            WindSpeedUnit.MPH -> "mph"
+        }
+    }
+
+    fun getThemeMode(): ThemeMode {
+        val value = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
+        return ThemeMode.valueOf(value!!)
+    }
+
+    fun setThemeMode(mode: ThemeMode) {
+        prefs.edit().putString(KEY_THEME_MODE, mode.name).apply()
     }
 }
 
