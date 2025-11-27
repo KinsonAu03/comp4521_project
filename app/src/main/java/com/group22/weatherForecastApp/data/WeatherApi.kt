@@ -22,10 +22,15 @@ interface WeatherApi {
 object RetrofitClient {
     private const val BASE_URL = "https://api.openweathermap.org/data/3.0/"
     
-    // Configure OkHttpClient with proper timeouts
+    // Configure OkHttpClient with proper timeouts and error handling
     private val okHttpClient: OkHttpClient by lazy {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY // Change to NONE in production
+            // Only log in debug builds to avoid performance issues in production
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
         
         OkHttpClient.Builder()
