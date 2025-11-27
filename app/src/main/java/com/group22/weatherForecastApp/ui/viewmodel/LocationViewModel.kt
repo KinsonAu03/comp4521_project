@@ -7,6 +7,7 @@ import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.data.GeocodingClient
 import com.group22.weatherForecastApp.data.GeocodingResponse
 import com.group22.weatherForecastApp.data.LocationService
+import com.group22.weatherForecastApp.data.LocationUtils
 import com.group22.weatherForecastApp.data.database.WeatherDatabase
 import com.group22.weatherForecastApp.data.database.entity.LocationEntity
 import com.group22.weatherForecastApp.ui.components.AppError
@@ -17,6 +18,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import android.database.sqlite.SQLiteException
 
 class LocationViewModel(application: Application) : AndroidViewModel(application) {
     private val locationDao = WeatherDatabase.getDatabase(application).locationDao()
@@ -98,12 +100,11 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
                 if (locationResult != null) {
                     // Check if location already exists
                     val existingLocations = locationDao.getAllLocations().first()
-                    val existing = existingLocations.firstOrNull { location ->
-                        val latDiff = kotlin.math.abs(location.latitude - locationResult.latitude)
-                        val lonDiff = kotlin.math.abs(location.longitude - locationResult.longitude)
-                        latDiff < AppConstants.Location.PROXIMITY_THRESHOLD && 
-                        lonDiff < AppConstants.Location.PROXIMITY_THRESHOLD
-                    }
+                    val existing = LocationUtils.findNearbyLocation(
+                        locations = existingLocations,
+                        targetLat = locationResult.latitude,
+                        targetLon = locationResult.longitude
+                    )
 
                     if (existing == null) {
                         // Add new location
@@ -162,12 +163,11 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
             try {
                 // Check if location already exists
                 val existingLocations = locationDao.getAllLocations().first()
-                val existing = existingLocations.firstOrNull { location ->
-                    val latDiff = kotlin.math.abs(location.latitude - latitude)
-                    val lonDiff = kotlin.math.abs(location.longitude - longitude)
-                    latDiff < AppConstants.Location.PROXIMITY_THRESHOLD && 
-                    lonDiff < AppConstants.Location.PROXIMITY_THRESHOLD
-                }
+                val existing = LocationUtils.findNearbyLocation(
+                    locations = existingLocations,
+                    targetLat = latitude,
+                    targetLon = longitude
+                )
 
                 if (existing != null) {
                     if (setAsUsing) {
@@ -306,7 +306,7 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
                 }
             }
 
-            is android.database.sqlite.SQLiteException, is androidx.room.RoomDatabaseException -> {
+            is SQLiteException -> {
                 AppError(
                     ErrorType.DATABASE_ERROR,
                     "Database error",

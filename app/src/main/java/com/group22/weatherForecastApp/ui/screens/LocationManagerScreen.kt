@@ -154,7 +154,8 @@ fun LocationManagerScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Error message card (for non-critical errors that can be shown inline)
-            if (errorState != null && errorState.type != ErrorType.LOCATION_ERROR) {
+            val currentError = errorState
+            if (currentError != null && currentError.type != ErrorType.LOCATION_ERROR) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -168,7 +169,7 @@ fun LocationManagerScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = errorState.message,
+                                text = currentError.message,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.weight(1f)
                             )
@@ -176,7 +177,7 @@ fun LocationManagerScreen(
                                 Icon(Icons.Default.Close, contentDescription = "Dismiss")
                             }
                         }
-                        errorState.details?.let { details ->
+                        currentError.details?.let { details ->
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = details,
@@ -276,11 +277,16 @@ fun LocationManagerScreen(
         }
         
         // Error Dialog for critical errors (location errors, network errors, etc.)
+        val criticalError = errorState?.takeIf { 
+            it.type == ErrorType.LOCATION_ERROR || 
+            it.type == ErrorType.NETWORK_ERROR || 
+            it.type == ErrorType.API_ERROR 
+        }
         ErrorDialog(
-            error = errorState?.takeIf { it.type == ErrorType.LOCATION_ERROR || it.type == ErrorType.NETWORK_ERROR || it.type == ErrorType.API_ERROR },
+            error = criticalError,
             onDismiss = { viewModel.clearError() },
             onRetry = {
-                when (errorState?.type) {
+                when (criticalError?.type) {
                     ErrorType.LOCATION_ERROR -> {
                         if (isPermissionError) {
                             locationPermissionLauncher.launch(LOCATION_PERMISSIONS)

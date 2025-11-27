@@ -5,9 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.group22.weatherForecastApp.data.AppConstants
+import com.group22.weatherForecastApp.ui.components.RefreshActionButton
+import com.group22.weatherForecastApp.ui.components.RefreshableContent
 import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 import java.text.SimpleDateFormat
@@ -40,30 +40,18 @@ fun DailyForecastDetailScreen(
                     }
                 },
                 actions = {
-                    if (isRefreshing) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(Spacing.lg)
-                                .padding(Spacing.md)
-                        )
-                    } else {
-                        IconButton(onClick = { viewModel.refreshWeather() }) {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = "Refresh"
-                            )
-                        }
-                    }
+                    RefreshActionButton(
+                        isRefreshing = isRefreshing,
+                        onRefresh = { viewModel.refreshWeather() }
+                    )
                 }
             )
         }
     ) { paddingValues ->
-        PullToRefreshBox(
+        RefreshableContent(
             isRefreshing = isRefreshing,
             onRefresh = { viewModel.refreshWeather() },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier = Modifier.padding(paddingValues)
         ) {
             LazyColumn(
                 modifier = Modifier

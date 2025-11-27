@@ -1,10 +1,7 @@
 package com.group22.weatherForecastApp.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,6 +11,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.ui.components.ErrorDialog
+import com.group22.weatherForecastApp.ui.components.RefreshActionButton
+import com.group22.weatherForecastApp.ui.components.RefreshableContent
 import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 
@@ -50,31 +49,19 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    if (isRefreshing) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(Spacing.lg)
-                                .padding(Spacing.md)
-                        )
-                    } else {
-                        IconButton(onClick = { viewModel.refreshWeather() }) {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = "Refresh"
-                            )
-                        }
-                    }
+                    RefreshActionButton(
+                        isRefreshing = isRefreshing,
+                        onRefresh = { viewModel.refreshWeather() }
+                    )
                 }
             ) 
         },
         modifier = modifier
     ) { paddingValues ->
-        PullToRefreshBox(
+        RefreshableContent(
             isRefreshing = isRefreshing,
             onRefresh = { viewModel.refreshWeather() },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier = Modifier.padding(paddingValues)
         ) {
             Column(
                 modifier = Modifier
