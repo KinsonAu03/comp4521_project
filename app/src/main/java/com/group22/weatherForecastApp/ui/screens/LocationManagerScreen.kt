@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.data.GeocodingResponse
 import com.group22.weatherForecastApp.data.database.entity.LocationEntity
 import com.group22.weatherForecastApp.ui.components.ErrorDialog
@@ -227,7 +228,7 @@ fun LocationManagerScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Favorites (${favoriteLocations.size}/5)",
+                    text = "Favorites (${favoriteLocations.size}/${AppConstants.Location.MAX_FAVORITES})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )

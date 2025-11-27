@@ -2,6 +2,7 @@ package com.group22.weatherForecastApp.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.group22.weatherForecastApp.data.AppConstants
 
 enum class TemperatureUnit {
     CELSIUS,
@@ -41,7 +42,8 @@ class PreferencesManager(context: Context) {
     fun convertTemperature(celsius: Double, unit: TemperatureUnit): Double {
         return when (unit) {
             TemperatureUnit.CELSIUS -> celsius
-            TemperatureUnit.FAHRENHEIT -> (celsius * 9.0 / 5.0) + 32.0
+            TemperatureUnit.FAHRENHEIT -> (celsius * AppConstants.Conversion.CELSIUS_TO_FAHRENHEIT_MULTIPLIER) + 
+                    AppConstants.Conversion.CELSIUS_TO_FAHRENHEIT_OFFSET
         }
     }
     
@@ -69,8 +71,8 @@ class PreferencesManager(context: Context) {
     fun convertWindSpeed(speedInMs: Double, unit: WindSpeedUnit): Double {
         return when (unit) {
             WindSpeedUnit.MS -> speedInMs
-            WindSpeedUnit.KMH -> speedInMs * 3.6
-            WindSpeedUnit.MPH -> speedInMs * 2.23694
+            WindSpeedUnit.KMH -> speedInMs * AppConstants.Conversion.MS_TO_KMH_MULTIPLIER
+            WindSpeedUnit.MPH -> speedInMs * AppConstants.Conversion.MS_TO_MPH_MULTIPLIER
         }
     }
 

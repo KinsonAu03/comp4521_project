@@ -3,6 +3,7 @@ package com.group22.weatherForecastApp.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.data.GeocodingClient
 import com.group22.weatherForecastApp.data.GeocodingResponse
 import com.group22.weatherForecastApp.data.LocationService
@@ -57,7 +58,7 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
             _isLoading.value = true
             _errorState.value = null
             try {
-                val results = geocodingApi.searchLocations(query, limit = 5)
+                val results = geocodingApi.searchLocations(query, limit = AppConstants.Location.GEOCODING_SEARCH_LIMIT)
                 _searchResults.value = results
                 // Clear error on success
                 if (results.isEmpty()) {
@@ -100,7 +101,8 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
                     val existing = existingLocations.firstOrNull { location ->
                         val latDiff = kotlin.math.abs(location.latitude - locationResult.latitude)
                         val lonDiff = kotlin.math.abs(location.longitude - locationResult.longitude)
-                        latDiff < 0.001 && lonDiff < 0.001
+                        latDiff < AppConstants.Location.PROXIMITY_THRESHOLD && 
+                        lonDiff < AppConstants.Location.PROXIMITY_THRESHOLD
                     }
 
                     if (existing == null) {
@@ -163,7 +165,8 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
                 val existing = existingLocations.firstOrNull { location ->
                     val latDiff = kotlin.math.abs(location.latitude - latitude)
                     val lonDiff = kotlin.math.abs(location.longitude - longitude)
-                    latDiff < 0.001 && lonDiff < 0.001
+                    latDiff < AppConstants.Location.PROXIMITY_THRESHOLD && 
+                    lonDiff < AppConstants.Location.PROXIMITY_THRESHOLD
                 }
 
                 if (existing != null) {
@@ -177,13 +180,13 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
                 if (setAsUsing) {
                     locationDao.clearUsingLocation()
                 } else {
-                    // Check if we can add more favorites (max 5)
+                    // Check if we can add more favorites
                     val favoriteCount = locationDao.getFavoriteLocationsCount()
-                    if (favoriteCount >= 5) {
+                    if (favoriteCount >= AppConstants.Location.MAX_FAVORITES) {
                         _errorState.value = AppError(
                             ErrorType.UNKNOWN_ERROR,
                             "Maximum favorite locations reached",
-                            "You can have up to 5 favorite locations. Please remove one before adding another."
+                            "You can have up to ${AppConstants.Location.MAX_FAVORITES} favorite locations. Please remove one before adding another."
                         )
                         return@launch
                     }

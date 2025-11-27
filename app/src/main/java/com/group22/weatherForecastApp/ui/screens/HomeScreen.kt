@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.ui.components.ErrorDialog
 import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
@@ -106,7 +107,7 @@ fun HomeScreen(
                 
                 // Daily Forecast Card
                 WeatherCard(
-                    title = "7-Day Forecast",
+                    title = "${AppConstants.Weather.DAILY_FORECAST_DAYS}-Day Forecast",
                     forecastCount = dailyForecast.size,
                     onClick = {
                         onNavigateToDailyForecast()

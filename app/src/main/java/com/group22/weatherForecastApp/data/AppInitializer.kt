@@ -3,6 +3,7 @@ package com.group22.weatherForecastApp.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.data.database.DemoData
 import com.group22.weatherForecastApp.data.database.WeatherDatabase
 import com.group22.weatherForecastApp.data.database.entity.LocationEntity
@@ -111,10 +112,11 @@ class AppInitializer(private val context: Context) {
                 // Check if this location already exists in database
                 val existingLocations = locationDao.getAllLocations().first()
                 val existingLocation = existingLocations.firstOrNull { location ->
-                    // Check if location is within ~100m (rough approximation)
+                    // Check if location is within proximity threshold (~100m)
                     val latDiff = kotlin.math.abs(location.latitude - locationResult.latitude)
                     val lonDiff = kotlin.math.abs(location.longitude - locationResult.longitude)
-                    latDiff < 0.001 && lonDiff < 0.001 // ~100m threshold
+                    latDiff < AppConstants.Location.PROXIMITY_THRESHOLD && 
+                    lonDiff < AppConstants.Location.PROXIMITY_THRESHOLD
                 }
                 
                 if (existingLocation != null) {

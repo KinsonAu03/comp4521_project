@@ -3,6 +3,7 @@ package com.group22.weatherForecastApp.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.data.PreferencesManager
 import com.group22.weatherForecastApp.data.RetrofitClient
 import com.group22.weatherForecastApp.data.TemperatureUnit
@@ -47,7 +48,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     val temperatureUnit: StateFlow<TemperatureUnit> = flow {
         while (true) {
             emit(preferencesManager.getTemperatureUnit())
-            kotlinx.coroutines.delay(100) // Check periodically
+            kotlinx.coroutines.delay(AppConstants.ViewModel.PREFERENCE_POLLING_DELAY_MS)
         }
     }.stateIn(
         viewModelScope,
@@ -58,7 +59,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     val themeMode : StateFlow<ThemeMode> = flow {
         while (true) {
             emit(preferencesManager.getThemeMode())
-            kotlinx.coroutines.delay(100) // Check periodically
+            kotlinx.coroutines.delay(AppConstants.ViewModel.PREFERENCE_POLLING_DELAY_MS)
         }
     }.stateIn(
         viewModelScope,
@@ -68,7 +69,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     val windUnit : StateFlow<WindSpeedUnit> = flow {
         while (true) {
             emit(preferencesManager.getWindSpeedUnit())
-            kotlinx.coroutines.delay(100) // Check periodically
+            kotlinx.coroutines.delay(AppConstants.ViewModel.PREFERENCE_POLLING_DELAY_MS)
         }
     }.stateIn(
         viewModelScope,

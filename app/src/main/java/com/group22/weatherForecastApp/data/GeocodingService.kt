@@ -1,6 +1,7 @@
 package com.group22.weatherForecastApp.data
 
 import com.group22.weatherForecastApp.BuildConfig
+import com.group22.weatherForecastApp.data.AppConstants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.http.GET
@@ -17,7 +18,7 @@ interface GeocodingApi {
     @GET("direct")
     suspend fun searchLocations(
         @Query("q") query: String,
-        @Query("limit") limit: Int = 5,
+        @Query("limit") limit: Int = AppConstants.Location.GEOCODING_SEARCH_LIMIT,
         @Query("appid") apiKey: String = BuildConfig.OPEN_WEATHER_API_KEY
     ): List<GeocodingResponse>
 }
@@ -46,9 +47,9 @@ object GeocodingClient {
         }
         
         OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS) // Connection timeout
-            .readTimeout(30, TimeUnit.SECONDS)    // Read timeout
-            .writeTimeout(30, TimeUnit.SECONDS)   // Write timeout
+            .connectTimeout(AppConstants.Network.CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(AppConstants.Network.READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(AppConstants.Network.WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
             .retryOnConnectionFailure(true)        // Retry on connection failure
             .build()

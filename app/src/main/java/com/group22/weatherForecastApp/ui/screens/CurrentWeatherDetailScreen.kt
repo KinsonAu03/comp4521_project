@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 import java.text.SimpleDateFormat
@@ -145,15 +146,15 @@ fun CurrentWeatherDetailScreen(
                     }
                 }
                 
-                // 24 Hour Forecast Section
+                // Hourly Forecast Section
                 item {
                     Text(
-                        text = "24 Hour Forecast",
+                        text = "${AppConstants.Weather.HOURLY_FORECAST_HOURS} Hour Forecast",
                         style = AppTextStyles.sectionHeader()
                     )
                 }
                 
-                items(hourlyForecast.take(24)) { hour ->
+                items(hourlyForecast.take(AppConstants.Weather.HOURLY_FORECAST_HOURS)) { hour ->
                     HourlyForecastItem(hour, viewModel)
                 }
             }

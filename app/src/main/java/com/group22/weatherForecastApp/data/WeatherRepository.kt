@@ -1,6 +1,7 @@
 package com.group22.weatherForecastApp.data
 
 import android.util.Log
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.data.database.dao.WeatherDataDao
 import com.group22.weatherForecastApp.data.database.entity.WeatherDataEntity
 
@@ -36,7 +37,7 @@ class WeatherRepository(
         
         // Log hourly forecast
         Log.d(tag, "HOURLY FORECAST (${response.hourly.size} hours):")
-        response.hourly.take(24).forEachIndexed { index, hourly ->
+        response.hourly.take(AppConstants.Weather.HOURLY_FORECAST_HOURS).forEachIndexed { index, hourly ->
             Log.d(tag, "  Hour $index: ${hourly.temp}°C, ${hourly.weather.firstOrNull()?.main}, " +
                     "Pop: ${hourly.pop}, Wind: ${hourly.wind_speed} m/s")
         }

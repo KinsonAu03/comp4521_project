@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.group22.weatherForecastApp.data.AppConstants
 import com.group22.weatherForecastApp.ui.theme.*
 import com.group22.weatherForecastApp.ui.viewmodel.WeatherViewModel
 import java.text.SimpleDateFormat
@@ -32,7 +33,7 @@ fun DailyForecastDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("7-Day Forecast") },
+                title = { Text("${AppConstants.Weather.DAILY_FORECAST_DAYS}-Day Forecast") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -70,7 +71,7 @@ fun DailyForecastDetailScreen(
                     .padding(Spacing.screenPadding),
                 verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacing)
             ) {
-                items(dailyForecast.take(7)) { day ->
+                items(dailyForecast.take(AppConstants.Weather.DAILY_FORECAST_DAYS)) { day ->
                     DailyForecastItem(day, viewModel)
                 }
             }
