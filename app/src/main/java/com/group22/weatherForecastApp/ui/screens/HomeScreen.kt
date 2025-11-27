@@ -164,7 +164,7 @@ fun WeatherCard(
             
             when {
                 weather != null -> {
-                    // Show weather icon
+                    // Show weather icon (only if available)
                     weather.conditionIcon?.let { icon ->
                         AsyncImage(
                             model = "https://openweathermap.org/img/wn/$icon@2x.png",
@@ -173,12 +173,16 @@ fun WeatherCard(
                         )
                     }
                     Spacer(modifier = Modifier.height(Spacing.sm))
+                    // Safe temperature conversion with fallback
+                    val convertedTemp = viewModel?.convertTemperature(weather.temperature)?.toInt() 
+                        ?: weather.temperature.toInt()
+                    val unitSymbol = viewModel?.getTemperatureUnitSymbol() ?: "°C"
                     Text(
-                        text = "${viewModel?.convertTemperature(weather.temperature)?.toInt() ?: weather.temperature.toInt()}${viewModel?.getTemperatureUnitSymbol() ?: "°C"}",
+                        text = "$convertedTemp$unitSymbol",
                         style = AppTextStyles.temperatureDisplay()
                     )
                     Text(
-                        text = weather.condition,
+                        text = weather.condition.ifEmpty { "Unknown" },
                         style = AppTextStyles.cardSubtitle()
                     )
                 }

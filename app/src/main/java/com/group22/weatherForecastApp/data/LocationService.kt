@@ -60,10 +60,19 @@ class LocationService(private val context: Context) {
                 // Get address using Geocoder
                 val address = getAddressFromLocation(locationResult.latitude, locationResult.longitude)
                 
+                // Build location name with fallback hierarchy
+                val locationName = when {
+                    address?.locality != null -> address.locality
+                    address?.subAdminArea != null -> address.subAdminArea
+                    address?.adminArea != null -> address.adminArea
+                    address?.featureName != null -> address.featureName
+                    else -> "Current Location"
+                }
+                
                 LocationResult(
                     latitude = locationResult.latitude,
                     longitude = locationResult.longitude,
-                    name = address?.locality ?: "Current Location",
+                    name = locationName,
                     country = address?.countryCode
                 )
             } else {
@@ -81,12 +90,35 @@ class LocationService(private val context: Context) {
 
     /**
      * Get address from coordinates using Geocoder
+     * Returns null if geocoding fails or no address is found
      */
     private fun getAddressFromLocation(latitude: Double, longitude: Double): android.location.Address? {
         return try {
+            // Validate coordinates
+            if (!latitude.isFinite() || !longitude.isFinite()) {
+                Log.w(tag, "Invalid coordinates: lat=$latitude, lon=$longitude")
+                return null
+            }
+            
+            // Check if Geocoder is available
+            if (!Geocoder.isPresent()) {
+                Log.w(tag, "Geocoder is not available on this device")
+                return null
+            }
+            
             val geocoder = Geocoder(context, Locale.getDefault())
             val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-            addresses?.firstOrNull()
+            
+            // Validate result
+            if (addresses.isNullOrEmpty()) {
+                Log.w(tag, "No address found for coordinates: lat=$latitude, lon=$longitude")
+                return null
+            }
+            
+            addresses.firstOrNull()
+        } catch (e: IllegalArgumentException) {
+            Log.e(tag, "Invalid coordinates for geocoding: lat=$latitude, lon=$longitude", e)
+            null
         } catch (e: Exception) {
             Log.e(tag, "Error getting address from location", e)
             null

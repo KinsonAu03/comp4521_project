@@ -68,64 +68,84 @@ class WeatherRepository(
         // This prevents duplicates if multiple refresh calls happen
         dao.deleteWeatherDataForLocation(locationId)
 
-        // Insert current weather
+        // Validate current weather data
+        if (response.current.weather.isEmpty()) {
+            Log.w(tag, "Warning: Current weather has no weather description")
+        }
+
+        // Insert current weather with proper null safety
+        val currentWeatherDescription = response.current.weather.firstOrNull()
         dao.insertWeatherData(
             WeatherDataEntity(
                 locationId = locationId,
                 temperature = response.current.temp,
                 feelsLike = response.current.feels_like,
-                condition = response.current.weather.firstOrNull()?.main ?: "",
-                conditionIcon = response.current.weather.firstOrNull()?.icon,
+                condition = currentWeatherDescription?.main ?: "Unknown",
+                conditionIcon = currentWeatherDescription?.icon,
                 humidity = response.current.humidity,
                 windSpeed = response.current.wind_speed,
-                windDirection = response.current.wind_deg,
-                pressure = response.current.pressure,
-                uvIndex = response.current.uvi,
-                visibility = response.current.visibility,
+                windDirection = response.current.wind_deg.takeIf { it >= 0 },
+                pressure = response.current.pressure.takeIf { it > 0 },
+                uvIndex = response.current.uvi.takeIf { it >= 0 },
+                visibility = response.current.visibility.takeIf { it >= 0 },
                 timestamp = response.current.dt * 1000L,
                 forecastType = "current"
             )
         )
 
-        // Insert hourly forecast
+        // Insert hourly forecast with null safety
         dao.insertWeatherDataList(
-            response.hourly.map {
-                WeatherDataEntity(
-                    locationId = locationId,
-                    temperature = it.temp,
-                    feelsLike = it.feels_like,
-                    condition = it.weather.firstOrNull()?.main ?: "",
-                    conditionIcon = it.weather.firstOrNull()?.icon,
-                    humidity = it.humidity,
-                    windSpeed = it.wind_speed,
-                    windDirection = it.wind_deg,
-                    pressure = it.pressure,
-                    uvIndex = it.uvi,
-                    visibility = it.visibility,
-                    timestamp = it.dt * 1000L,
-                    forecastType = "hourly"
-                )
+            response.hourly.mapNotNull { hourly ->
+                val weatherDescription = hourly.weather.firstOrNull()
+                // Skip entries with invalid data
+                if (weatherDescription == null) {
+                    Log.w(tag, "Warning: Hourly forecast entry missing weather description at timestamp ${hourly.dt}")
+                    null
+                } else {
+                    WeatherDataEntity(
+                        locationId = locationId,
+                        temperature = hourly.temp,
+                        feelsLike = hourly.feels_like,
+                        condition = weatherDescription.main,
+                        conditionIcon = weatherDescription.icon,
+                        humidity = hourly.humidity,
+                        windSpeed = hourly.wind_speed,
+                        windDirection = hourly.wind_deg.takeIf { it >= 0 },
+                        pressure = hourly.pressure.takeIf { it > 0 },
+                        uvIndex = hourly.uvi.takeIf { it >= 0 },
+                        visibility = hourly.visibility.takeIf { it >= 0 },
+                        timestamp = hourly.dt * 1000L,
+                        forecastType = "hourly"
+                    )
+                }
             }
         )
 
-        // Insert daily forecast
+        // Insert daily forecast with null safety
         dao.insertWeatherDataList(
-            response.daily.map {
-                WeatherDataEntity(
-                    locationId = locationId,
-                    temperature = it.temp.day,
-                    feelsLike = it.feels_like.day,
-                    condition = it.weather.firstOrNull()?.main ?: "",
-                    conditionIcon = it.weather.firstOrNull()?.icon,
-                    humidity = it.humidity,
-                    windSpeed = it.wind_speed,
-                    windDirection = it.wind_deg,
-                    pressure = it.pressure,
-                    uvIndex = it.uvi,
-                    visibility = it.visibility,
-                    timestamp = it.dt * 1000L,
-                    forecastType = "daily"
-                )
+            response.daily.mapNotNull { daily ->
+                val weatherDescription = daily.weather.firstOrNull()
+                // Skip entries with invalid data
+                if (weatherDescription == null) {
+                    Log.w(tag, "Warning: Daily forecast entry missing weather description at timestamp ${daily.dt}")
+                    null
+                } else {
+                    WeatherDataEntity(
+                        locationId = locationId,
+                        temperature = daily.temp.day,
+                        feelsLike = daily.feels_like.day,
+                        condition = weatherDescription.main,
+                        conditionIcon = weatherDescription.icon,
+                        humidity = daily.humidity,
+                        windSpeed = daily.wind_speed,
+                        windDirection = daily.wind_deg.takeIf { it >= 0 },
+                        pressure = daily.pressure.takeIf { it > 0 },
+                        uvIndex = daily.uvi.takeIf { it >= 0 },
+                        visibility = daily.visibility.takeIf { it >= 0 },
+                        timestamp = daily.dt * 1000L,
+                        forecastType = "daily"
+                    )
+                }
             }
         )
         

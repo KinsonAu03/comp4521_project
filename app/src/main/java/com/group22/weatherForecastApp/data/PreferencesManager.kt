@@ -53,8 +53,13 @@ class PreferencesManager(context: Context) {
     }
 
     fun getWindSpeedUnit(): WindSpeedUnit {
-        val value = prefs.getString(KEY_WIND_UNIT, WindSpeedUnit.KMH.name)
-        return WindSpeedUnit.valueOf(value!!)
+        val value = prefs.getString(KEY_WIND_UNIT, WindSpeedUnit.KMH.name) ?: WindSpeedUnit.KMH.name
+        return try {
+            WindSpeedUnit.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            // If stored value is invalid, return default
+            WindSpeedUnit.KMH
+        }
     }
 
     fun setWindSpeedUnit(unit: WindSpeedUnit) {
@@ -78,8 +83,13 @@ class PreferencesManager(context: Context) {
     }
 
     fun getThemeMode(): ThemeMode {
-        val value = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
-        return ThemeMode.valueOf(value!!)
+        val value = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name) ?: ThemeMode.SYSTEM.name
+        return try {
+            ThemeMode.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            // If stored value is invalid, return default
+            ThemeMode.SYSTEM
+        }
     }
 
     fun setThemeMode(mode: ThemeMode) {
