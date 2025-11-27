@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.group22.weatherForecastApp.data.GeocodingResponse
 import com.group22.weatherForecastApp.data.database.entity.LocationEntity
+import com.group22.weatherForecastApp.ui.components.ErrorDialog
+import com.group22.weatherForecastApp.ui.components.ErrorType
 import com.group22.weatherForecastApp.ui.utils.LOCATION_PERMISSIONS
 import com.group22.weatherForecastApp.ui.utils.rememberLocationPermissionLauncher
 import com.group22.weatherForecastApp.ui.viewmodel.LocationViewModel
@@ -31,7 +33,7 @@ fun LocationManagerScreen(
     val favoriteLocations by viewModel.favoriteLocations.collectAsState(initial = emptyList())
     val searchResults by viewModel.searchResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
+    val errorState by viewModel.errorState.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
     var showSearchResults by remember { mutableStateOf(false) }
@@ -42,20 +44,13 @@ fun LocationManagerScreen(
             // Permission granted, automatically retry getting location
             viewModel.getCurrentDeviceLocation()
         } else {
-            // Permission denied, clear error and show message
+            // Permission denied, clear error
             viewModel.clearError()
         }
     }
     
     // Check if error is related to permission
-    val isPermissionError = errorMessage?.contains("permission", ignoreCase = true) == true
-
-    // Show error snackbar
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            // Error will be shown in UI
-        }
-    }
+    val isPermissionError = errorState?.type == ErrorType.LOCATION_ERROR
 
     Scaffold(
         topBar = {
@@ -157,8 +152,8 @@ fun LocationManagerScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Error message
-            if (errorMessage != null) {
+            // Error message card (for non-critical errors that can be shown inline)
+            if (errorState != null && errorState.type != ErrorType.LOCATION_ERROR) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
@@ -172,7 +167,7 @@ fun LocationManagerScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = errorMessage!!,
+                                text = errorState.message,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.weight(1f)
                             )
@@ -180,23 +175,13 @@ fun LocationManagerScreen(
                                 Icon(Icons.Default.Close, contentDescription = "Dismiss")
                             }
                         }
-                        
-                        // Show "Grant Permission" button if error is permission-related
-                        if (isPermissionError) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(
-                                onClick = {
-                                    locationPermissionLauncher.launch(LOCATION_PERMISSIONS)
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.LocationOn,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Grant Location Permission")
-                            }
+                        errorState.details?.let { details ->
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = details,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
+                            )
                         }
                     }
                 }
@@ -288,6 +273,33 @@ fun LocationManagerScreen(
                 }
             }
         }
+        
+        // Error Dialog for critical errors (location errors, network errors, etc.)
+        ErrorDialog(
+            error = errorState?.takeIf { it.type == ErrorType.LOCATION_ERROR || it.type == ErrorType.NETWORK_ERROR || it.type == ErrorType.API_ERROR },
+            onDismiss = { viewModel.clearError() },
+            onRetry = {
+                when (errorState?.type) {
+                    ErrorType.LOCATION_ERROR -> {
+                        if (isPermissionError) {
+                            locationPermissionLauncher.launch(LOCATION_PERMISSIONS)
+                        } else {
+                            viewModel.getCurrentDeviceLocation()
+                        }
+                    }
+                    ErrorType.NETWORK_ERROR, ErrorType.API_ERROR -> {
+                        if (searchQuery.isNotBlank()) {
+                            viewModel.searchLocations(searchQuery)
+                        }
+                    }
+                    else -> {}
+                }
+            },
+            onContactSupport = {
+                // TODO: Implement contact support
+                viewModel.clearError()
+            }
+        )
     }
 }
 
