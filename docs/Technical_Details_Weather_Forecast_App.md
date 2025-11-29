@@ -56,9 +56,7 @@ Assuming this is an Android mobile app (common for COMP4521 or similar courses f
 - **Forecasts**: Hourly (24-48 hours) and daily (7-14 days) via separate API calls; display in lists or graphs using Compose's LazyColumn or third-party charts.
 
 ### Weather Alerts and Notifications
-- **Push Notifications**: Use Firebase Cloud Messaging (FCM) for severe alerts. 
-  - Dependency: `com.google.firebase:firebase-messaging`.
-- Local notifications for non-push alerts using `NotificationCompat` from `androidx.core:core`.
+- **Local Notifications**: Use `NotificationCompat` from `androidx.core:core` for weather alerts.
 - **Permissions**: Request `POST_NOTIFICATIONS` for Android 13+.
 
 ### Widgets

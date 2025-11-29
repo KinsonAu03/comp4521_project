@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.kapt)
-    id("com.google.gms.google-services")
     alias(libs.plugins.compose.compiler)
 }
 
@@ -94,11 +93,6 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
-    
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-messaging-ktx")
     
     // Widgets - Jetpack Glance
     implementation(libs.androidx.glance.appwidget)
