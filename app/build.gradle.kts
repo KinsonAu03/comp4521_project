@@ -93,6 +93,7 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
     
     // Widgets - Jetpack Glance
     implementation(libs.androidx.glance.appwidget)
